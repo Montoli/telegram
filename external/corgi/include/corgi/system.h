@@ -60,6 +60,7 @@ class System : public SystemInterface {
     /// @brief The data to associate with the Entity.
     T data;
 
+
     /// @brief Construct a new ComponentData from an existing ComponentData.
     ///
     /// @param[in] src An existing ComponentData whose data should be moved
@@ -82,9 +83,8 @@ class System : public SystemInterface {
       return *this;
     }
 
-   private:
-    ComponentData(const ComponentData&);
-    ComponentData& operator=(const ComponentData&);
+		ComponentData(const ComponentData&) = default;
+		ComponentData& operator=(const ComponentData&) = default;
   };
 
   /// @typedef EntityIterator
@@ -509,12 +509,16 @@ class System : public SystemInterface {
     is_thread_safe_ = is_thread_safe;
   }
 
+
+
 	//-------------------------------
-	// Network synchronization.
-	virtual void SetRewindBufferProperties(WorldTime buffer_timestep,
-		WorldTime buffer_history_length) {}
-	virtual void StartRewindBuffer() {}
-	virtual void RewindToTimestamp(WorldTime new_timestamp) {}
+	// Network synchronization:
+	virtual void SetRewindBufferProperties(int snapshot_count,
+		WorldTime snapshot_frequency) {};
+	virtual void TakeRewindSnapshot(WorldTime timestamp) {};
+	virtual bool RewindToTimestamp(WorldTime timestamp) {};
+	virtual SystemChecksum GetSystemChecksum() { return 0; };
+
 	//-------------------------------
 
 
@@ -566,8 +570,7 @@ class System : public SystemInterface {
   /// @var component_data_
   ///
   /// @brief Storage for all of the data for the System.
-  //VectorPool<ComponentData> component_data_;
-	std::vector<ComponentData> component_data_;
+  std::vector<ComponentData> component_data_;
 
   /// @var entity_manager_
   ///

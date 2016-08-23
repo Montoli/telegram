@@ -39,9 +39,6 @@ private:
 	PhysicsSystem physics_system_;
 	FountainProjectile fountain_projectiles_;
 
-
-
-
 };
 
 

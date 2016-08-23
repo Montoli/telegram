@@ -14,7 +14,7 @@ New in version 2.0.0:
 * Added new accessor functions to replace some of the functionality that used to live on the entity objects.
   * EntityManager::IsEntityValid will tell you if an entity is still in the system, or has been deleted.
   * EntityManager::IsMarkedForDeletion will tell you if an entity is going to go away at the end of the next update.
-
+* System::ComponentData no longer has private constructors/assignment operators.
 
 rename 
 Todo:

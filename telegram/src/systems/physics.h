@@ -1,6 +1,7 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H
-#include "corgi/system.h"
+//#include "corgi/system.h"
+#include "corgi/network_system.h"
 #include "math_common.h"
 
 struct PhysicsData {
@@ -9,6 +10,8 @@ struct PhysicsData {
 		acceleration(vec2(0, 0)),
 		angular_velocity(quat::identity),
 		angular_acceleration(quat::identity) {}
+
+//	PhysicsData& operator=(const PhysicsData &) = default;
 
 	vec2 velocity;
 	vec2 acceleration;
@@ -19,7 +22,8 @@ struct PhysicsData {
 };
 
 
-class PhysicsSystem : public corgi::System<PhysicsData> {
+//class PhysicsSystem : public corgi::System<PhysicsData> {
+class PhysicsSystem : public corgi::NetworkSystem<PhysicsData> {
 public:
 
   virtual void UpdateAllEntities(corgi::WorldTime delta_time);
