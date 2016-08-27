@@ -1,8 +1,6 @@
-/*This source code copyrighted by Lazy Foo' Productions (2004-2015)
-and may not be redistributed without written permission.*/
-
 //Using SDL and standard IO
 #include <SDL.h>
+
 #include <stdio.h>
 
 #include "GL/glew.h"
@@ -11,8 +9,21 @@ and may not be redistributed without written permission.*/
 #include "states/main_state.h"
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1024;
+const int SCREEN_HEIGHT = 768;
+
+const int TARGET_FPS = 60;
+const float TARGET_FRAME_TIME = 1000 / TARGET_FPS;
+
+void PrintGLString(GLenum name)
+{
+  const GLubyte* ret = glGetString(name);
+  if (ret == 0)
+    SDL_Log("Failed to get GL string: %d\n", name);
+  else
+    SDL_Log("%s\n", ret);
+}
+
 
 int main(int argc, char* args[])
 {
@@ -32,7 +43,7 @@ int main(int argc, char* args[])
   {
     //Create window
     window = SDL_CreateWindow(
-			"SDL Tutorial", 
+			"Telegram", 
 			SDL_WINDOWPOS_UNDEFINED, 
 			SDL_WINDOWPOS_UNDEFINED, 
 			SCREEN_WIDTH,
@@ -46,7 +57,17 @@ int main(int argc, char* args[])
     else
     {
 
+
+
 			SDL_GLContext gl_context = SDL_GL_CreateContext(window);
+      SDL_Log("GL_VERSION: ");
+      PrintGLString(GL_VERSION);
+      SDL_Log("GL_RENDERER: ");
+      PrintGLString(GL_RENDERER);
+      SDL_Log("GL_SHADING_LANGUAGE_VERSION: ");
+      PrintGLString(GL_SHADING_LANGUAGE_VERSION);
+//SDL_Log("GL_EXTENSIONS: ");
+//      PrintGLString(GL_EXTENSIONS);
 
 
 			// Once finished with OpenGL functions, the SDL_GLContext can be deleted.
@@ -71,17 +92,43 @@ int main(int argc, char* args[])
 			// weird - seems like this has to be initted AFTER SDL has created
 			// the context?
 			glewInit();
-
+      SDL_GL_SetSwapInterval(0);
 
       StateManager state_manager;
 
       state_manager.PushState(new MainState(window, screen_surface, gl_context,
 				SCREEN_WIDTH, SCREEN_HEIGHT));
 
+
+      int frame_counter = 0;
+      Uint64 end_of_second = SDL_GetPerformanceCounter() + SDL_GetPerformanceFrequency();
+      Uint64 now;
+
+      Uint64 next_frame_update = SDL_GetPerformanceCounter();
+      const Uint64 time_between_updates = SDL_GetPerformanceFrequency() / TARGET_FPS;
+
       while (!state_manager.IsAppQuitting()) {
-        SDL_Delay(1000/60);
-				state_manager.Update(1000 / 60);
-				state_manager.Render(1000 / 60);
+        Uint64 current_time = SDL_GetPerformanceCounter();
+
+        // regulate our framerate - block until it's time to move on.
+        while (current_time < next_frame_update) {
+          current_time = SDL_GetPerformanceCounter();
+        }
+        next_frame_update += time_between_updates;
+        if (next_frame_update < current_time) next_frame_update = current_time;
+
+        state_manager.Update(TARGET_FRAME_TIME);
+        state_manager.Render(TARGET_FRAME_TIME);
+
+        // track framerate:
+        frame_counter++;
+        now = SDL_GetPerformanceCounter();
+        if (now > end_of_second) {
+          SDL_Log("FPS: %d", frame_counter);
+          frame_counter = 0;
+          end_of_second = SDL_GetPerformanceCounter() + SDL_GetPerformanceFrequency();
+        }
+
 			}
 			SDL_GL_DeleteContext(gl_context);
 		}

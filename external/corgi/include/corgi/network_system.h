@@ -57,8 +57,8 @@ class NetworkSystem : public System<T> {
 		int start = most_recent_buffer_index_;
 		// Find the most recent snapshot that is before the requested timestamp.
 		bool done = false;
-
 		while (!done) {
+			/*
 			RewindBufferEntry& snapshot = rewind_buffer_[most_recent_buffer_index_];
 			// if we ever hit an invalid snapshot then that means we don't have
 			// enough data to perform the rewind operation.  Return true and abort.

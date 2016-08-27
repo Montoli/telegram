@@ -137,7 +137,38 @@ const void* EntityManager::GetSystemDataAsVoid(
              : nullptr;
 }
 
+void EntityManager::VanillaUpdateSystems(WorldTime delta_time) {
+  unupdated_systems_.clear();
+  currently_updating_systems_.clear();
+  updated_systems_.clear();
+
+  for (size_t i = 0; i < systems_.size(); i++) {
+    unupdated_systems_.insert(systems_[static_cast<SystemId>(i)]->GetSystemId());
+  }
+  while (!IsSystemUpdateComplete()) {
+    SystemId system_id = ClaimSystemToUpdate(true);
+    // Lock the mutex BEFORE we do our comparisons
+    // to make sure no one broadcasts after we commit
+    // to CondWaiting, but before we actually CondWait...
+    if (system_id == kInvalidSystem && !IsSystemUpdateComplete()) {
+      SDL_CondWait(worker_thread_cond_,
+        worker_thread_mutex_);
+    }
+    else {
+      SystemInterface* system = GetSystem(system_id);
+      system->UpdateAllEntities(delta_time_);
+      MarkSystemAsUpdated(system_id);
+    }
+  }
+  DeleteMarkedEntities();
+
+}
+
+
 void EntityManager::UpdateSystems(WorldTime delta_time) {
+
+  //VanillaUpdateSystems(delta_time);
+  //return;
 	// Assert if you haven't finalized the system list.
 	assert(is_system_list_final_);
 

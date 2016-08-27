@@ -22,8 +22,8 @@ struct PhysicsData {
 };
 
 
-//class PhysicsSystem : public corgi::System<PhysicsData> {
-class PhysicsSystem : public corgi::NetworkSystem<PhysicsData> {
+class PhysicsSystem : public corgi::System<PhysicsData> {
+//class PhysicsSystem : public corgi::NetworkSystem<PhysicsData> {
 public:
 
   virtual void UpdateAllEntities(corgi::WorldTime delta_time);

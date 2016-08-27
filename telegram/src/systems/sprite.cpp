@@ -23,19 +23,22 @@ void SpriteSystem::AddPointToBuffer(vec4 p, vec2 uv, vec4 tint) {
 	buffer_count_++;
 }
 
+
 void SpriteSystem::UpdateAllEntities(corgi::WorldTime delta_time) {
+
 	// build our vertex buffer:
 	buffer_length_ = 0;
 	buffer_count_ = 0;
-	//printf("updating %d sprites!\n", component_data_.size());
-	for (auto itr = begin(); itr != end(); ++itr) {
+  //vertex_buffer_.clear(0);
+  for (auto itr = begin(); itr != end(); ++itr) {
 		corgi::Entity entity = itr->entity;
-		TransformData* transform_data = Data<TransformData>(entity);
+
+    TransformData* transform_data = Data<TransformData>(entity);
 		SpriteData* sprite_data = Data<SpriteData>(entity);
 		
 		float width = sprite_data->size.x();
 		float height = sprite_data->size.y();
-		
+
 		vec4 origin_offset = vec4(transform_data->origin.x(),
 				transform_data->origin.y(), 0.0f, 0.0f);
 		vec4 p1 = vec4(0.0f,  0.0f,   0.0f, 1.0f) - origin_offset;
@@ -121,7 +124,7 @@ void SpriteSystem::RenderSprites() {
 		static_cast<GLsizei>(common->screen_size.y()));
 
 	// Clear the color buffer
-	glClear(GL_COLOR_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT);
 
 	// Use the program object
 	glUseProgram(shader_program);

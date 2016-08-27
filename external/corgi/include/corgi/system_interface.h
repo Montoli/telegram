@@ -69,6 +69,9 @@ public:
 	/// delta time for this frame.
 	virtual void UpdateAllEntities(WorldTime delta_time) = 0;
 
+  /// @brief Returns the number of entities registered with the system.
+  virtual int EntityCount() = 0;
+
 	/// @brief Returns true if this component has data associated with the
 	/// entity provided.
 	virtual bool HasDataForEntity(const Entity) = 0;

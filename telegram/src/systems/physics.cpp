@@ -10,8 +10,6 @@ void PhysicsSystem::DeclareDependencies() {
 	SetIsThreadSafe(true);
 }
 
-
-
 void PhysicsSystem::UpdateAllEntities(corgi::WorldTime delta_time) {
 	for (auto itr = begin(); itr != end(); ++itr) {
 		corgi::Entity entity = itr->entity;

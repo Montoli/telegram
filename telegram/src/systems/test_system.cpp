@@ -24,7 +24,7 @@ void TestSystem::UpdateAllEntities(corgi::WorldTime delta_time) {
 
 
 void TestSystem::InitEntity(corgi::Entity entity) {
-  printf("entity from system 1 initted!");
+  SDL_Log("entity from system 1 initted!");
 	SetIsThreadSafe(true);
 
 }

@@ -48,8 +48,7 @@ void FountainProjectile::InitEntity(corgi::Entity entity) {
 	sprite->size = vec2(50, 50);
 	sprite->tint = vec4(0.5f + rnd(), 0.5f + rnd(), 0.5f + rnd(), 1.0f);
 
-	physics->velocity = vec2(rnd() * 6.0f - 3.0f, rnd() * -5.0f);
+	physics->velocity = vec2(rnd() * 6.0f - 3.0f, rnd() * -10.0f);
 	physics->acceleration = vec2(0.0f, 0.1f);
-
-
+  physics->angular_velocity = quat::FromAngleAxis(0.1f, vec3(0, 0, 1));
 }

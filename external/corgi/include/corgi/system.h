@@ -40,7 +40,7 @@ namespace corgi {
 /// Entity.
 template <typename T>
 class System : public SystemInterface {
- public:
+public:
   /// @struct ComponentData
   /// @brief A structure of data that is associated with each Entity.
   ///
@@ -83,8 +83,8 @@ class System : public SystemInterface {
       return *this;
     }
 
-		ComponentData(const ComponentData&) = default;
-		ComponentData& operator=(const ComponentData&) = default;
+    ComponentData(const ComponentData&) = default;
+    ComponentData& operator=(const ComponentData&) = default;
   };
 
   /// @typedef EntityIterator
@@ -92,7 +92,7 @@ class System : public SystemInterface {
   /// @brief An iterator to iterate through all of the Entities in the
   /// System.
   //typedef typename VectorPool<ComponentData>::Iterator EntityIterator;
-	typedef typename std::vector<ComponentData>::iterator EntityIterator;
+  typedef typename std::vector<ComponentData>::iterator EntityIterator;
 
   /// @typedef value_type
   ///
@@ -133,10 +133,10 @@ class System : public SystemInterface {
       return GetComponentData(entity);
     }
     // No existing data, so we allocate some and return it:
-		component_data_.push_back(ComponentData());
-		ComponentIndex index = static_cast<ComponentIndex>(component_data_.size() - 1);
+    component_data_.push_back(ComponentData());
+    ComponentIndex index = static_cast<ComponentIndex>(component_data_.size() - 1);
     component_index_lookup_[entity] = index;
-		component_data_[index].entity = entity;
+    component_data_[index].entity = entity;
     AddSystemDependencies(entity);
     InitEntity(entity);
     return &(component_data_[index].data);
@@ -157,14 +157,14 @@ class System : public SystemInterface {
     // if you want to double-check if data exists before removing it.
     assert(HasDataForEntity(entity));
     RemoveEntityInternal(entity);
-		ComponentIndex index = component_index_lookup_[entity];
+    ComponentIndex index = component_index_lookup_[entity];
 
-		component_index_lookup_.erase(entity);
-		if (component_data_.size() > 1) {
-			component_data_[index] = std::move(component_data_[component_data_.size() - 1]);
-			component_index_lookup_[component_data_[index].entity] = index;
-		}
-		component_data_.pop_back();
+    component_index_lookup_.erase(entity);
+    if (component_data_.size() > 1) {
+      component_data_[index] = std::move(component_data_[component_data_.size() - 1]);
+      component_index_lookup_[component_data_[index].entity] = index;
+    }
+    component_data_.pop_back();
   }
 
 
@@ -185,6 +185,11 @@ class System : public SystemInterface {
   /// @brief Updates all Entities. This is normally called, once per frame,
   /// by the EntityManager.
   virtual void UpdateAllEntities(WorldTime /*delta_time*/) {}
+
+  /// @brief Returns the number of entities registered with the system.
+  virtual int EntityCount() {
+    return component_data_.size();
+  }
 
   /// @brief Checks if this component contains any data associated with the
   /// supplied entity.
@@ -265,11 +270,6 @@ class System : public SystemInterface {
   const T* GetComponentData(const Entity entity) const {
     return const_cast<System*>(this)->GetComponentData(entity);
   }
-
-
-
-
-
 
 
   /// @brief Clears all tracked System data.
@@ -516,9 +516,8 @@ class System : public SystemInterface {
 	virtual void SetRewindBufferProperties(int snapshot_count,
 		WorldTime snapshot_frequency) {};
 	virtual void TakeRewindSnapshot(WorldTime timestamp) {};
-	virtual bool RewindToTimestamp(WorldTime timestamp) {};
+	virtual bool RewindToTimestamp(WorldTime timestamp) { return false; };
 	virtual SystemChecksum GetSystemChecksum() { return 0; };
-
 	//-------------------------------
 
 

@@ -270,6 +270,7 @@ class EntityManager {
   /// @param[in] delta_time A WorldTime that represents the timestep since
   /// the last update.
   void UpdateSystems(WorldTime delta_time);
+  void VanillaUpdateSystems(WorldTime delta_time);
 
   /// @brief Clears all data from all Components, empties the list
   /// of Components themselves, and then empties the list of Entities.
