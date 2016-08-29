@@ -19,8 +19,8 @@ public:
 		SDL_GLContext context, int screen_width, int screen_height);
 
 
-	virtual void Update(double delta_time);
-	virtual void Render(double delta_time);
+	virtual void Update(corgi::WorldTime delta_time);
+	virtual void Render(corgi::WorldTime delta_time);
 
   virtual void Init();
   virtual void Cleanup() {}
@@ -38,6 +38,8 @@ private:
 	TransformSystem transform_system_;
 	PhysicsSystem physics_system_;
 	FountainProjectile fountain_projectiles_;
+
+	int time_direction_;
 
 };
 

@@ -23,7 +23,7 @@ bool stack_locked_ = false;
 
 */
 
-void StateManager::Update(double delta_time) {
+void StateManager::Update(corgi::WorldTime delta_time) {
   if (state_stack_.size() > 0) {
     // Store off the old current state, and update it.  Then call the update function
     BaseState* old_current = currently_executing_state_;
@@ -42,7 +42,7 @@ void StateManager::Update(double delta_time) {
   EndOfUpdateCleanup();
 }
 
-void StateManager::Render(double delta_time) {
+void StateManager::Render(corgi::WorldTime delta_time) {
 	if (state_stack_.size() > 0) {
 		state_stack_[state_stack_.size() - 1]->Render(delta_time);
 	// todo: write this.  Should be basically he same as update.

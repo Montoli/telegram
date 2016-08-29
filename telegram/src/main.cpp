@@ -13,7 +13,6 @@ const int SCREEN_WIDTH = 1024;
 const int SCREEN_HEIGHT = 768;
 
 const int TARGET_FPS = 60;
-const float TARGET_FRAME_TIME = 1000 / TARGET_FPS;
 
 void PrintGLString(GLenum name)
 {
@@ -117,8 +116,8 @@ int main(int argc, char* args[])
         next_frame_update += time_between_updates;
         if (next_frame_update < current_time) next_frame_update = current_time;
 
-        state_manager.Update(TARGET_FRAME_TIME);
-        state_manager.Render(TARGET_FRAME_TIME);
+        state_manager.Update(1);
+        state_manager.Render(1);
 
         // track framerate:
         frame_counter++;

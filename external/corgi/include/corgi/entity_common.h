@@ -18,7 +18,7 @@
 #ifndef CORGI_ENTITY_COMMON_H_
 #define CORGI_ENTITY_COMMON_H_
 
-//#define CORGI_ENFORCE_SYSTEM_DEPENDENCIES
+#define CORGI_ENFORCE_SYSTEM_DEPENDENCIES
 
 namespace corgi {
 
@@ -48,7 +48,8 @@ const SystemId kInvalidSystem = static_cast<SystemId>(-1);
 /// @typedef WorldTime
 ///
 /// @brief A typedef that represents time in the game.
-typedef double WorldTime;
+typedef uint64_t WorldTime;
+//typedef double WorldTime;
 
 /// @typedef ComponentIndex
 ///
@@ -88,6 +89,13 @@ enum SystemAccessDependencyType {
   kReadAccess,
   kReadWriteAccess,
 };
+
+// used for networking:
+typedef uint64_t SystemChecksum;
+
+
+static const int kRewindBufferSize = 60;
+static const int kRewindBufferFrequency = 10;
 
 /// @}
 

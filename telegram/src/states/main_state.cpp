@@ -57,10 +57,12 @@ void MainState::Init() {
   sprite_data->size = vec2(40, 60);
   transform_data->scale = vec2(1.0f, 1.0f);
   transform_data->orientation = quat::FromAngleAxis(2.3f, vec3(0, 0, 1));
+
+	time_direction_ = 1;
 }
 
 
-void MainState::Render(double delta_time) {
+void MainState::Render(corgi::WorldTime delta_time) {
   glClearColor(0, 1, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -69,17 +71,26 @@ void MainState::Render(double delta_time) {
 }
 
 
-void MainState::Update(double delta_time) {
+void MainState::Update(corgi::WorldTime delta_time) {
   //printf("---------------------------------------------\n");
   //printf("start of update!\n");
   //printf("---------------------------------------------\n");
 
-  entity_manager_.UpdateSystems(delta_time);
+	if (time_direction_ == 1) {
+		entity_manager_.UpdateSystems(delta_time);
+	} else if (time_direction_ == -1) {
+		corgi::WorldTime target_time = entity_manager_.CurrentTimestamp() - 1;
+		bool problems = entity_manager_.RewindToTimestamp(target_time);
+		if (!problems) {
+			entity_manager_.AdvanceToTimestamp(target_time);
+		}
+	}
 
   SDL_Event event;
 
-  //if (rnd() < 0.2) {
-  {
+	//if (true) {
+  if (time_direction_ == 1 && rnd() < 0.2) {
+	//if (entity_manager_.CurrentTimestamp() % 60 == 0){
     corgi::Entity particle_thing = entity_manager_.AllocateNewEntity();
     entity_manager_.AddComponent<FountainProjectile>(particle_thing);
     
@@ -90,17 +101,43 @@ void MainState::Update(double delta_time) {
     physics_system_.EntityCount(),
     sprite_system_.EntityCount());
     */
-  while (SDL_PollEvent(&event)) {
+	while (SDL_PollEvent(&event)) {
     // We are only worried about SDL_KEYDOWN and SDL_KEYUP events
-    switch (event.type) {
-    case SDL_KEYDOWN:
-      printf("Key press detected\n");
-      break;
+		switch (event.type) {
+		case SDL_KEYDOWN:
+			SDL_Log("Key press detected\n");
+			break;
 
-    case SDL_KEYUP:
-      printf("Key release detected\n");
-      EndState();
-      break;
+		case SDL_KEYUP:
+			SDL_Log("Key release detected\n");
+
+			switch (event.key.keysym.sym) {
+			case SDLK_ESCAPE:
+				EndState();
+				break;
+			case SDLK_RETURN:
+				SDL_Log("Return pressed!");
+				//problems = entity_manager_.RewindToTimestamp(entity_manager_.CurrentTimestamp() - 60);
+				//SDL_Log(problems ? "Could not rewind." : "Rewound!");
+
+				if (time_direction_ != 0) {
+					time_direction_ = 0;
+				} else {
+					time_direction_ = 1;
+				}
+				break;
+			case SDLK_LEFT:
+				time_direction_ = -1;
+				break;
+			case SDLK_RIGHT:
+				time_direction_ = 1;
+				break;
+			default:
+				break;
+			}
+		
+
+
 
     default:
       break;

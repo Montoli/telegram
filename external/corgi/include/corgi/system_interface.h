@@ -213,13 +213,10 @@ public:
 
 	//-------------------------------
 	// Network synchronization:
-	typedef uint64_t SystemChecksum;
 
-	virtual void SetRewindBufferProperties(int snapshot_count,
-		WorldTime snapshot_frequency) = 0;
+	virtual void SetRewindBufferSize(int snapshot_count) = 0;
 	virtual void TakeRewindSnapshot(WorldTime timestamp) = 0;
-
-	// Returns true if a snapshot could not be found.  (i. e. we
+  // Returns true if a snapshot could not be found.  (i. e. we
 	// need to retransmit state data and resync.)
 	virtual bool RewindToTimestamp(WorldTime timestamp) = 0;
 	virtual SystemChecksum GetSystemChecksum() = 0;

@@ -1,6 +1,7 @@
 #ifndef TRANSFORM_H
 #define TRANSFORM_H
-#include "corgi/system.h"
+//#include "corgi/system.h"
+#include "corgi/network_system.h"
 #include "math_common.h"
 
 struct TransformData {
@@ -42,7 +43,7 @@ struct TransformData {
 };
 
 
-class TransformSystem : public corgi::System<TransformData> {
+class TransformSystem : public corgi::NetworkSystem<TransformData> {
 public:
 
   virtual void UpdateAllEntities(corgi::WorldTime delta_time);

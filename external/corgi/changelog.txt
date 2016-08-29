@@ -4,8 +4,9 @@ New in version 2.0.0:
   * Component has been renamed System
   * ComponentData has been renamed Component
 * delta_time changed from int -> double
+* Just kidding, it's back to uint_64 now, for accurate timetamp tracking (netoworking)
 * Real dependency tracking
-* Support functions for multighreading.  (accessdependencies, etc)
+* Support functions for multithreading.  (accessdependencies, etc)
 * Automatic Multithreading scheduling
 * Added the ability to get the name of a system.  (automagically populated!)
 * renamed AddEntityToSystem<> -> AddComponent<>
@@ -16,8 +17,15 @@ New in version 2.0.0:
   * EntityManager::IsMarkedForDeletion will tell you if an entity is going to go away at the end of the next update.
 * System::ComponentData no longer has private constructors/assignment operators.
 
-rename 
+* Added networksystem class
+* systems now support network sync functions in systeminterface.  (By default they're just not implemented)
+* 
+
 Todo:
 * Specialization for systems that have no data
 * networking!
 * Make smarter multithreading scheduler.
+
+
+Short term todo:
+* 

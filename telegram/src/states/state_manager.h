@@ -1,13 +1,14 @@
 #ifndef STATEMANAGER_H
 #define STATEMANAGER_H
 #include <memory>
-#include "corgi\entity_manager.h"
+#include "corgi/entity_manager.h"
+#include "corgi/entity_common.h"
 #include "base_state.h"
 
 class StateManager {
 public:
-  void Update(double delta_time);
-  void Render(double delta_time);
+  void Update(corgi::WorldTime delta_time);
+  void Render(corgi::WorldTime delta_time);
 
    void PushState(BaseState* new_state);
 

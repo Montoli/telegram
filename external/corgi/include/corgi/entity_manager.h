@@ -360,6 +360,19 @@ class EntityManager {
 		max_worker_threads_ = max_worker_threads;
 	}
 
+	//-------------------------------
+	// Network synchronization:
+	void TakeRewindSnapshot(WorldTime timestamp);
+	bool RewindToTimestamp(WorldTime timestamp);
+	bool AdvanceToTimestamp(WorldTime timestamp);
+	SystemChecksum GetSystemChecksum();
+	void ResetRewindBuffers();
+	WorldTime CurrentTimestamp() { return current_timestamp_; }
+	// TODO: Desperately need to make this optional, so that we don't
+	// have to carry the rewind buffer overhead if we're not using it.
+
+	//-------------------------------
+
  private:
   /// @brief Handles the majority of the work for registering a System (
   /// aside from some of the template stuff). In particular, it verifies that
@@ -461,6 +474,23 @@ class EntityManager {
 	SDL_cond* worker_thread_cond_;
 	WorldTime delta_time_;
 	int max_worker_threads_;
+
+	// networking stuff:
+	std::unordered_set<SystemId> desynched_systems_;
+	WorldTime current_timestamp_;
+
+	 struct RewindBufferEntry {
+		 RewindBufferEntry() : is_valid(false) {}
+		 bool is_valid;
+		 WorldTime timestamp;
+		 EntityStorageContainer entity_data;
+	 };
+
+	 std::vector<RewindBufferEntry> rewind_buffer_;
+	 size_t most_recent_buffer_index_;
+	 size_t rewind_buffer_size_;
+
+
 
   /// @var entities_to_delete_
   ///

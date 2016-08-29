@@ -2,7 +2,7 @@
 #define SPRITE_SYSTEM_H
 #include <SDL.h>
 #include <SDL_image.h>
-#include "corgi/system.h"
+#include "corgi/network_system.h"
 #include "math_common.h"
 #include "GL/glew.h"
 
@@ -14,7 +14,7 @@ struct SpriteData {
 };
 
 
-class SpriteSystem : public corgi::System<SpriteData> {
+class SpriteSystem : public corgi::NetworkSystem<SpriteData> {
 public:
 
 	virtual void Init();

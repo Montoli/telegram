@@ -19,24 +19,18 @@
 #include <memory>
 
 namespace corgi {
-
-	// Basic implementation for 
-
-
-
 template <typename T>
 class NetworkSystem : public System<T> {
  public:
 	NetworkSystem() {}
 
-	virtual void SetRewindBufferProperties(int snapshot_count,
-			WorldTime snapshot_frequency) override {
-
-		//rewind_buffer = std::unique_ptr<RewindBufferEntry>(new RewindBufferEntry[snapshot_count]);
+	virtual void SetRewindBufferSize(int snapshot_count) override {
 		rewind_buffer_.resize(snapshot_count);
 		rewind_buffer_size_ = snapshot_count;
 		most_recent_buffer_index_ = 0;
-
+		for (size_t i = 0; i < rewind_buffer_size_; i++) {
+			rewind_buffer_[i].is_valid = false;
+		}
 	}
 
 	virtual void TakeRewindSnapshot(WorldTime timestamp) override {
@@ -44,13 +38,14 @@ class NetworkSystem : public System<T> {
 		RewindBufferEntry& snapshot = rewind_buffer_[most_recent_buffer_index_];
 		snapshot.timestamp = timestamp;
 		snapshot.component_data = component_data_;
+		snapshot.component_index_lookup = component_index_lookup_;
 		snapshot.is_valid = true;
 	}
 
 		// x % y is negative, if x is negative.  This makes sure it is
 		// always positive, so -2 % 10 = 8 instead of -2.
 	inline int SafeMod(int dividend, int divisor) {
-		return divisor + (dividend % divisor) % divisor;
+		return (divisor + (dividend % divisor)) % divisor;
 	}
 
 	virtual bool RewindToTimestamp(WorldTime timestamp) override {
@@ -58,21 +53,20 @@ class NetworkSystem : public System<T> {
 		// Find the most recent snapshot that is before the requested timestamp.
 		bool done = false;
 		while (!done) {
-			/*
 			RewindBufferEntry& snapshot = rewind_buffer_[most_recent_buffer_index_];
 			// if we ever hit an invalid snapshot then that means we don't have
 			// enough data to perform the rewind operation.  Return true and abort.
 			if (!snapshot.is_valid) return true;
-			if (snapshot.timestamp < timestamp) {
+			if (snapshot.timestamp <= timestamp) {
 				done = true;
 				break;
 			} else {
 				snapshot.is_valid = false;
-					most_recent_buffer = SafeMod(most_recent_buffer_index_ - 1, rewind_buffer_size_)
+				most_recent_buffer_index_ = SafeMod(most_recent_buffer_index_ - 1, rewind_buffer_size_);
 			}
-			*/
-			//done = most_recent_buffer_index_ < 
 		}
+		component_data_ = rewind_buffer_[most_recent_buffer_index_].component_data;
+		component_index_lookup_ = rewind_buffer_[most_recent_buffer_index_].component_index_lookup;
 		return false;
 	}
 
@@ -87,14 +81,9 @@ class NetworkSystem : public System<T> {
 		std::unordered_map<EntityIdType, ComponentIndex> component_index_lookup;
 	};
 
-
-	//std::unique_ptr<RewindBufferEntry> rewind_buffer_;
 	std::vector<RewindBufferEntry> rewind_buffer_;
-
 	size_t most_recent_buffer_index_;
 	size_t rewind_buffer_size_;
-
-
 };
 
 }  // corgi

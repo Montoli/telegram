@@ -41,8 +41,8 @@ void SpriteSystem::UpdateAllEntities(corgi::WorldTime delta_time) {
 
 		vec4 origin_offset = vec4(transform_data->origin.x(),
 				transform_data->origin.y(), 0.0f, 0.0f);
-		vec4 p1 = vec4(0.0f,  0.0f,   0.0f, 1.0f) - origin_offset;
-		vec4 p2 = vec4(width, 0.0f,   0.0f, 1.0f) - origin_offset;
+		vec4 p1 = vec4(0.0f,  0.0f, 0.0f, 1.0f) - origin_offset;
+		vec4 p2 = vec4(width, 0.0f, 0.0f, 1.0f) - origin_offset;
 		vec4 p3 = vec4(0.0f,  height, 0.0f, 1.0f) - origin_offset;
 		vec4 p4 = vec4(width, height, 0.0f, 1.0f) - origin_offset;
 
@@ -61,7 +61,10 @@ void SpriteSystem::UpdateAllEntities(corgi::WorldTime delta_time) {
 		AddPointToBuffer(p3, vec2(0, 0), sprite_data->tint);
 		AddPointToBuffer(p4, vec2(0, 0), sprite_data->tint);
 
-		if (buffer_length_ >= kTotalBufferSize - 10) break;
+		if (buffer_length_ >= kTotalBufferSize - 10) {
+			assert(buffer_length_ < kTotalBufferSize - 10);
+			break;
+		}
 	}
 }
 
@@ -122,9 +125,6 @@ void SpriteSystem::RenderSprites() {
 	// Set the viewport
 	glViewport(0, 0, static_cast<GLsizei>(common->screen_size.x()),
 		static_cast<GLsizei>(common->screen_size.y()));
-
-	// Clear the color buffer
-	//glClear(GL_COLOR_BUFFER_BIT);
 
 	// Use the program object
 	glUseProgram(shader_program);

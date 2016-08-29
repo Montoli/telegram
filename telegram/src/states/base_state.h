@@ -1,13 +1,15 @@
 #ifndef BASE_STATE_H
 #define BASE_STATE_H
 
+#include "corgi/entity_common.h"
+
 class StateManager;
 
 class BaseState {
 public:
 
-  virtual void Update(double delta_time) {}
-  virtual void Render(double delta_time) {}
+  virtual void Update(corgi::WorldTime delta_time) {}
+  virtual void Render(corgi::WorldTime delta_time) {}
 
   virtual void Init() {}
   virtual void Cleanup() {}

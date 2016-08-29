@@ -110,17 +110,19 @@ void EntityManager::RegisterSystemHelper(SystemInterface* new_system,
 
 void EntityManager::FinalizeSystemList() {
   for (size_t i = 0; i < systems_.size(); i++) {
-    if (systems_[i]) systems_[i]->DeclareDependencies();
+		if (systems_[i]) {
+			systems_[i]->DeclareDependencies();
+		}
 	}
   is_system_list_final_ = true;
   //todo: validate dependencies, make sure none are circular, etc.
 
-
 	for (int i = 0; i < max_worker_threads_; i++) {
 		SDL_CreateThread(EntityManager::EntityManagerWorkerThread,
 			"WorkerThread", this);
-
 	}
+
+	ResetRewindBuffers();
 }
 
 void* EntityManager::GetSystemDataAsVoid(Entity entity,
@@ -137,6 +139,10 @@ const void* EntityManager::GetSystemDataAsVoid(
              : nullptr;
 }
 
+
+// A vanilla version of the update system.  No threads.
+// Mostly included for testing purposes.  Not guaranteed stable or
+// up to date.
 void EntityManager::VanillaUpdateSystems(WorldTime delta_time) {
   unupdated_systems_.clear();
   currently_updating_systems_.clear();
@@ -166,7 +172,10 @@ void EntityManager::VanillaUpdateSystems(WorldTime delta_time) {
 
 
 void EntityManager::UpdateSystems(WorldTime delta_time) {
-
+	if (current_timestamp_ % kRewindBufferFrequency == 0) {
+		TakeRewindSnapshot(current_timestamp_);
+	}
+	current_timestamp_ += delta_time;
   //VanillaUpdateSystems(delta_time);
   //return;
 	// Assert if you haven't finalized the system list.
@@ -464,5 +473,99 @@ Entity EntityManager::CreateEntityFromData(const void* data) {
   assert(entity_factory_ != nullptr);
   return entity_factory_->CreateEntityFromData(data, this);
 }
+
+
+//------------
+
+// x % y is negative, if x is negative.  This makes sure it is
+// always positive, so -2 % 10 = 8 instead of -2.
+inline int SafeMod(int dividend, int divisor) {
+	return (divisor + (dividend % divisor)) % divisor;
+}
+
+void EntityManager::ResetRewindBuffers() {
+	for (size_t i = 0; i < systems_.size(); i++) {
+		if (systems_[i]) {
+			systems_[i]->SetRewindBufferSize(kRewindBufferSize);
+		}
+	}
+	current_timestamp_ = 0;
+
+	rewind_buffer_.resize(kRewindBufferSize);
+	rewind_buffer_size_ = kRewindBufferSize;
+	most_recent_buffer_index_ = 0;
+	for (size_t i = 0; i < rewind_buffer_size_; i++) {
+		rewind_buffer_[i].is_valid = false;
+		rewind_buffer_[i].entity_data.clear();
+	}
+}
+
+
+void EntityManager::TakeRewindSnapshot(WorldTime timestamp) {
+	for (size_t i = 0; i < systems_.size(); i++) {
+		systems_[i]->TakeRewindSnapshot(timestamp);
+	}
+
+	most_recent_buffer_index_ = (most_recent_buffer_index_ + 1) % rewind_buffer_size_;
+	RewindBufferEntry& snapshot = rewind_buffer_[most_recent_buffer_index_];
+	snapshot.timestamp = timestamp;
+	snapshot.entity_data = entities_;
+	snapshot.is_valid = true;
+}
+
+// returns false if there were no errors.
+bool EntityManager::RewindToTimestamp(WorldTime timestamp) {
+	desynched_systems_.clear();
+	for (size_t i = 0; i < systems_.size(); i++) {
+		if (systems_[i]->RewindToTimestamp(timestamp)) {
+				desynched_systems_.insert(systems_[i]->GetSystemId());
+		}
+	}
+
+	int start = most_recent_buffer_index_;
+	// Find the most recent snapshot that is before the requested timestamp.
+	bool done = false;
+	while (!done) {
+		RewindBufferEntry& snapshot = rewind_buffer_[most_recent_buffer_index_];
+		// if we ever hit an invalid snapshot then that means we don't have
+		// enough data to perform the rewind operation.  Return true and abort.
+		if (!snapshot.is_valid) return true;
+		if (snapshot.timestamp <= timestamp) {
+			done = true;
+			break;
+		} else {
+			snapshot.is_valid = false;
+			most_recent_buffer_index_ = SafeMod(most_recent_buffer_index_ - 1, rewind_buffer_size_);
+		}
+	}
+	entities_ = rewind_buffer_[most_recent_buffer_index_].entity_data;
+	current_timestamp_ = rewind_buffer_[most_recent_buffer_index_].timestamp;
+
+	// return true if anything couldn't rewind.
+	return desynched_systems_.size() > 0;
+}
+
+bool EntityManager::AdvanceToTimestamp(WorldTime timestamp) {
+	//assert(current_timestamp_ <= timestamp);
+	if (current_timestamp_ > timestamp) {
+		return true;
+	}
+	while (current_timestamp_ < timestamp) {
+		UpdateSystems(1);
+	}
+	return false;
+}
+
+
+// TODO: write this!
+SystemChecksum EntityManager::GetSystemChecksum() {
+	return 0;
+}
+
+
+
+
+//////////////////////
+
 
 }  // corgi
