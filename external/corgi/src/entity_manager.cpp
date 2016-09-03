@@ -31,6 +31,7 @@ EntityManager::EntityManager()
 			worker_thread_mutex_(SDL_CreateMutex()),
 			worker_thread_cond_(SDL_CreateCond()),
 			max_worker_threads_(DEFAULT_MAX_THREADS - 1),
+      isFastForwarding_(false),
 			next_entity_id_(1) {}
 
 EntityManager::~EntityManager() {
@@ -545,15 +546,20 @@ bool EntityManager::RewindToTimestamp(WorldTime timestamp) {
 	return desynched_systems_.size() > 0;
 }
 
+
+
 bool EntityManager::AdvanceToTimestamp(WorldTime timestamp) {
 	//assert(current_timestamp_ <= timestamp);
 	if (current_timestamp_ > timestamp) {
 		return true;
 	}
-	while (current_timestamp_ < timestamp) {
+  isFastForwarding_ = true;
+  while (current_timestamp_ < timestamp) {
+    isFastForwarding_ = (current_timestamp_ < timestamp - 1);
 		UpdateSystems(1);
 	}
-	return false;
+    isFastForwarding_ = false;
+    return false;
 }
 
 

@@ -25,7 +25,7 @@ void SpriteSystem::AddPointToBuffer(vec4 p, vec2 uv, vec4 tint) {
 
 
 void SpriteSystem::UpdateAllEntities(corgi::WorldTime delta_time) {
-
+  if (entity_manager_->IsFastForwarding()) return;
 	// build our vertex buffer:
 	buffer_length_ = 0;
 	buffer_count_ = 0;

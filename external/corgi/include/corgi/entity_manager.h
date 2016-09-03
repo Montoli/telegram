@@ -368,6 +368,8 @@ class EntityManager {
 	SystemChecksum GetSystemChecksum();
 	void ResetRewindBuffers();
 	WorldTime CurrentTimestamp() { return current_timestamp_; }
+
+  bool IsFastForwarding() { return isFastForwarding_; }
 	// TODO: Desperately need to make this optional, so that we don't
 	// have to carry the rewind buffer overhead if we're not using it.
 
@@ -478,6 +480,7 @@ class EntityManager {
 	// networking stuff:
 	std::unordered_set<SystemId> desynched_systems_;
 	WorldTime current_timestamp_;
+  bool isFastForwarding_;
 
 	 struct RewindBufferEntry {
 		 RewindBufferEntry() : is_valid(false) {}
