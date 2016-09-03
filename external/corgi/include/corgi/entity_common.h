@@ -94,8 +94,8 @@ enum SystemAccessDependencyType {
 typedef uint64_t SystemChecksum;
 
 
-static const int kRewindBufferSize = 60;
-static const int kRewindBufferFrequency = 10;
+static const int kRewindBufferSize = 120;
+static const int kRewindBufferFrequency = 5;
 
 /// @}
 

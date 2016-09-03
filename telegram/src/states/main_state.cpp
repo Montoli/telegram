@@ -63,7 +63,7 @@ void MainState::Init() {
 
 
 void MainState::Render(corgi::WorldTime delta_time) {
-  glClearColor(0, 1, 0, 1);
+  glClearColor(0.0f, 0.3f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
   sprite_system_.RenderSprites();
