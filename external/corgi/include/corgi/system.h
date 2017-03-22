@@ -513,6 +513,7 @@ public:
 
 	//-------------------------------
 	// Network synchronization:
+	virtual bool IsNetworkSystem() { return false; }
 	virtual void SetRewindBufferSize(int snapshot_count) {}
 	virtual void TakeRewindSnapshot(WorldTime timestamp) {}
 	virtual bool RewindToTimestamp(WorldTime timestamp) { return false; }

@@ -24,6 +24,8 @@ class NetworkSystem : public System<T> {
  public:
 	NetworkSystem() {}
 
+	virtual bool IsNetworkSystem() { return true; }
+
 	virtual void SetRewindBufferSize(int snapshot_count) override {
 		rewind_buffer_.resize(snapshot_count);
 		rewind_buffer_size_ = snapshot_count;

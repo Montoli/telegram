@@ -95,7 +95,7 @@ typedef uint64_t SystemChecksum;
 
 
 static const int kRewindBufferSize = 120;
-static const int kRewindBufferFrequency = 5;
+static const int kRewindBufferFrequency = 10;
 
 /// @}
 

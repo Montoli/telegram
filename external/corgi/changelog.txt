@@ -28,4 +28,6 @@ Todo:
 
 
 Short term todo:
-* 
+* Make separate entity pool for entities with networksystem components
+* Write logic so that when rewinds happen, 
+* Enforce checks that any 

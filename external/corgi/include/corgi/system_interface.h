@@ -213,7 +213,7 @@ public:
 
 	//-------------------------------
 	// Network synchronization:
-
+	virtual bool IsNetworkSystem() = 0;
 	virtual void SetRewindBufferSize(int snapshot_count) = 0;
 	virtual void TakeRewindSnapshot(WorldTime timestamp) = 0;
   // Returns true if a snapshot could not be found.  (i. e. we
